@@ -159,6 +159,8 @@
 					<th>subtotal</th>
 					<th>total</th>
 				</tr>
+			</thead>
+			<tbody>
 				{#each people as person}
 					<tr>
 						<td>{person.name}</td>
@@ -180,7 +182,7 @@
 						</td>
 					</tr>
 				{/each}
-			</thead>
+			</tbody>
 		</table>
 	{:else if subtotal > itemSum}
 		<p>❌ items are less than subtotal</p>
