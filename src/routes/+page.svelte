@@ -39,7 +39,7 @@
 	let itemNumber = items.length;
 	let itemName = `item ${++itemNumber}`;
 	let itemValue = 10;
-	let itemPayers = [people[0].id];
+	let itemPayers = [] as string[];
 
 	$: itemSum = items.reduce((sum, item) => sum + item.value, 0);
 	$: itemsMatchSubtotal = itemSum.toFixed(2) === subtotal.toFixed(2);
@@ -138,7 +138,7 @@
 				];
 				itemName = `item ${++itemNumber}`;
 				itemValue = 10;
-				itemPayers = [people[0].id];
+				itemPayers = [];
 			}}
 			disabled={itemPayers.length === 0}
 		>
