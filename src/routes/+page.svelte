@@ -45,12 +45,12 @@
 	$: itemsMatchSubtotal = itemSum.toFixed(2) === subtotal.toFixed(2);
 </script>
 
-<h1>bill splitter 🧾💵</h1>
+<h1>bill splitter 🧾 💵</h1>
 
 <section>
 	<h2>people</h2>
 	{#each people as person}
-		<div style="display: flex; gap: 1rem;">
+		<div style="display: flex; gap: 1rem; align-items: center;">
 			<input style="flex-grow: 1" bind:this={person.input} bind:value={person.name} />
 			<button on:click={() => person.input?.select()}>✏️</button>
 			<button on:click={() => (people = people.filter((p) => p !== person))}> ❌ </button>
@@ -107,42 +107,49 @@
 	<h2>items</h2>
 
 	{#each items as item}
-		<fieldset>
-			<legend>{item.name}</legend>
+		<div>
+			<button on:click={() => (items = items.filter((i) => i !== item))}> ❌ </button>
+			<strong>{item.name}</strong> -
 			<strong>${item.value}</strong>
 			{item.payers.length > 1 ? ' split between ' : ' paid by '}
 			<strong>
 				{item.payers.map((payer) => people.find((person) => person.id === payer)?.name).join(', ')}
 			</strong>
-			<button on:click={() => (items = items.filter((i) => i !== item))}> ❌ </button>
-		</fieldset>
+		</div>
 	{/each}
 
-	<label>name <input type="text" bind:value={itemName} /></label>
-	<label>price $<input type="number" bind:value={itemValue} /></label>
-	<label>
-		payers <br />
-		{#each people as person}
-			<label>
-				<input type="checkbox" bind:group={itemPayers} value={person.id} />
-				{person.name}
-			</label>
-		{/each}
-	</label>
-	<button
-		on:click={() => {
-			items = [
-				...items,
-				{ name: itemName, value: itemValue, payers: itemPayers, id: crypto.randomUUID() }
-			];
-			itemName = `item ${++itemNumber}`;
-			itemValue = 10;
-			itemPayers = [];
-		}}
-		disabled={itemPayers.length === 0}
-	>
-		+ item
-	</button>
+	<br />
+
+	<div>
+		<label>name <input type="text" bind:value={itemName} /></label>
+		<label>price $<input type="number" bind:value={itemValue} /></label>
+		<label>
+			payers <br />
+			{#each people as person}
+				<label>
+					<input type="checkbox" bind:group={itemPayers} value={person.id} />
+					{person.name}
+					{itemPayers.includes(person.id)
+						? `($${Number((itemValue / itemPayers.length).toFixed(2))})`
+						: ''}
+				</label>
+			{/each}
+		</label>
+		<button
+			on:click={() => {
+				items = [
+					...items,
+					{ name: itemName, value: itemValue, payers: itemPayers, id: crypto.randomUUID() }
+				];
+				itemName = `item ${++itemNumber}`;
+				itemValue = 10;
+				itemPayers = [];
+			}}
+			disabled={itemPayers.length === 0}
+		>
+			+ item
+		</button>
+	</div>
 </section>
 
 <section>
