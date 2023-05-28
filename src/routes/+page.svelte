@@ -23,7 +23,7 @@
 
 	// TODO: implement two way bindings on these
 
-	let taxPercentage = 4.6;
+	let taxPercentage = 8.1;
 	$: tax = subtotal * (taxPercentage / 100);
 
 	let tipPercentage = 20;
@@ -45,18 +45,19 @@
 	$: itemsMatchSubtotal = itemSum.toFixed(2) === subtotal.toFixed(2);
 </script>
 
-<h1>🧾💵 bill splitter</h1>
+<h1>bill splitter 🧾💵</h1>
 
 <section>
 	<h2>people</h2>
 	{#each people as person}
-		<fieldset>
-			<input bind:this={person.input} bind:value={person.name} />
+		<div style="display: flex; gap: 1rem;">
+			<input style="flex-grow: 1" bind:this={person.input} bind:value={person.name} />
 			<button on:click={() => person.input?.select()}>✏️</button>
 			<button on:click={() => (people = people.filter((p) => p !== person))}> ❌ </button>
-		</fieldset>
+		</div>
 	{/each}
 	<button
+		style="text-align: center"
 		on:click={() =>
 			(people = [
 				...people,
@@ -75,7 +76,7 @@
 		</label>
 	</p>
 
-	<fieldset>
+	<div style="display: flex; gap: 1rem; align-items: center">
 		<label>
 			tax %<input type="number" autocomplete="off" bind:value={taxPercentage} />
 		</label>
@@ -83,9 +84,9 @@
 		<label>
 			tax $<input type="number" autocomplete="off" bind:value={tax} disabled />
 		</label>
-	</fieldset>
+	</div>
 
-	<fieldset>
+	<div style="display: flex; gap: 1rem; align-items: center">
 		<label>
 			tip %<input type="number" autocomplete="off" bind:value={tipPercentage} />
 		</label>
@@ -93,7 +94,7 @@
 		<label>
 			tip $<input type="number" autocomplete="off" bind:value={tip} disabled />
 		</label>
-	</fieldset>
+	</div>
 
 	<p>
 		total <strong>
@@ -117,34 +118,31 @@
 		</fieldset>
 	{/each}
 
-	<fieldset>
-		<legend>new item</legend>
-		<label>name <input type="text" bind:value={itemName} /></label>
-		<label>price $<input type="number" bind:value={itemValue} /></label>
-		<label>
-			payers <br />
-			{#each people as person}
-				<label>
-					<input type="checkbox" bind:group={itemPayers} value={person.id} />
-					{person.name}
-				</label>
-			{/each}
-		</label>
-		<button
-			on:click={() => {
-				items = [
-					...items,
-					{ name: itemName, value: itemValue, payers: itemPayers, id: crypto.randomUUID() }
-				];
-				itemName = `item ${++itemNumber}`;
-				itemValue = 10;
-				itemPayers = [];
-			}}
-			disabled={itemPayers.length === 0}
-		>
-			+ item
-		</button>
-	</fieldset>
+	<label>name <input type="text" bind:value={itemName} /></label>
+	<label>price $<input type="number" bind:value={itemValue} /></label>
+	<label>
+		payers <br />
+		{#each people as person}
+			<label>
+				<input type="checkbox" bind:group={itemPayers} value={person.id} />
+				{person.name}
+			</label>
+		{/each}
+	</label>
+	<button
+		on:click={() => {
+			items = [
+				...items,
+				{ name: itemName, value: itemValue, payers: itemPayers, id: crypto.randomUUID() }
+			];
+			itemName = `item ${++itemNumber}`;
+			itemValue = 10;
+			itemPayers = [];
+		}}
+		disabled={itemPayers.length === 0}
+	>
+		+ item
+	</button>
 </section>
 
 <section>
