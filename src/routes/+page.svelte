@@ -22,33 +22,35 @@
 
 	// TODO: implement two way bindings on these
 
-	let taxPercentage = 8.1;
+	let taxPercentage = 6.825;
 	$: tax = subtotal * (taxPercentage / 100);
 
 	let tipPercentage = 20;
 	$: tip = subtotal * (tipPercentage / 100);
 
-	let items = [] as {
-		name: string;
-		value: number;
-		payers: string[];
-		id: string;
-	}[];
+	let items = [
+		{
+			name: 'item 1',
+			value: 10,
+			payers: [] as string[],
+			id: crypto.randomUUID(),
+			nameInput: null as HTMLInputElement | null,
+			priceInput: null as HTMLInputElement | null
+		}
+	];
 
 	let itemNumber = items.length;
-	let itemName = `item ${++itemNumber}`;
-	let itemValue = 10;
-	let itemPayers = [] as string[];
 
-	$: itemSum = items.reduce((sum, item) => sum + item.value, 0);
+	$: validItems = items.filter((item) => item.payers.length > 0);
+	$: itemSum = validItems.reduce((sum, item) => sum + item.value, 0);
 	$: itemsMatchSubtotal = itemSum.toFixed(2) === subtotal.toFixed(2);
 </script>
 
 <h1>bill splitter 🧾 💵</h1>
 
 <h2>people</h2>
-{#each people as person}
-	<div style="display: flex; gap: 1rem; align-items: center;">
+{#each people as person (person.id)}
+	<div style="display: flex; gap: 1rem; align-items: baseline;">
 		<input style="flex-grow: 1" bind:this={person.input} bind:value={person.name} />
 		<button on:click={() => person.input?.select()}>✏️</button>
 		<button on:click={() => (people = people.filter((p) => p !== person))}> ❌ </button>
@@ -62,7 +64,7 @@
 			{ name: `Person ${++personNumber}`, id: crypto.randomUUID(), input: null }
 		])}
 >
-	+ 😃
+	+ person
 </button>
 
 <h2>totals</h2>
@@ -72,7 +74,7 @@
 	</label>
 </p>
 
-<div style="display: flex; gap: 1rem; align-items: center">
+<div style="display: flex; gap: 1rem; align-items: baseline">
 	<label>
 		tax %<input type="number" inputmode="decimal" autocomplete="off" bind:value={taxPercentage} />
 	</label>
@@ -82,7 +84,7 @@
 	</label>
 </div>
 
-<div style="display: flex; gap: 1rem; align-items: center">
+<div style="display: flex; gap: 1rem; align-items: baseline">
 	<label>
 		tip %<input type="number" inputmode="decimal" autocomplete="off" bind:value={tipPercentage} />
 	</label>
@@ -100,54 +102,46 @@
 
 <h2>items</h2>
 
-{#each items as item}
-	<div style="display: flex; align-items: center; gap: 1rem">
-		<button on:click={() => (items = items.filter((i) => i !== item))}> ❌ </button>
-		<div>
-			<strong>{item.name}</strong> -
-			<strong>${item.value}</strong>
-			{item.payers.length > 1 ? ' split between ' : ' paid by '}
-			<strong>
-				{item.payers.map((payer) => people.find((person) => person.id === payer)?.name).join(', ')}
-			</strong>
+{#each items as item (item.id)}
+	<fieldset style={item.payers.length === 0 ? 'border-color: red' : ''}>
+		<div style="display: flex; gap: 1rem; align-items: baseline">
+			<input style="flex-grow: 1" type="text" bind:value={item.name} />
+			<div style="display: flex; align-items: baseline">
+				<span>$</span>
+				<input style="flex-grow: 1" inputmode="decimal" type="number" bind:value={item.value} />
+			</div>
+			<button on:click={() => (items = items.filter((i) => i.id != item.id))}> ❌ </button>
 		</div>
-	</div>
+		<label>
+			paid by <br />
+			<div style="display: flex; gap: 0rem 1rem; flex-wrap: wrap">
+				{#each people as person}
+					<label style="white-space: nowrap">
+						<input type="checkbox" bind:group={item.payers} value={person.id} />
+						{person.name}
+					</label>
+				{/each}
+			</div>
+		</label>
+	</fieldset>
 {/each}
 
 <div>
-	<div style="display: flex; gap: 1rem;">
-		<label>name <input style="flex-grow: 1" type="text" bind:value={itemName} /></label>
-		<label
-			>price $<input
-				style="flex-grow: 1"
-				inputmode="decimal"
-				type="number"
-				bind:value={itemValue}
-			/></label
-		>
-	</div>
-	<label>
-		paid by <br />
-		<div style="display: flex; gap: 1rem; flex-wrap: wrap">
-			{#each people as person}
-				<label style="white-space: nowrap">
-					<input type="checkbox" bind:group={itemPayers} value={person.id} />
-					{person.name}
-				</label>
-			{/each}
-		</div>
-	</label>
 	<button
 		on:click={() => {
+			itemNumber++;
 			items = [
 				...items,
-				{ name: itemName, value: itemValue, payers: itemPayers, id: crypto.randomUUID() }
+				{
+					name: `item ${itemNumber}`,
+					value: 10,
+					payers: [],
+					id: crypto.randomUUID(),
+					nameInput: null,
+					priceInput: null
+				}
 			];
-			itemName = `item ${++itemNumber}`;
-			itemValue = 10;
-			itemPayers = [];
 		}}
-		disabled={itemPayers.length === 0}
 	>
 		+ item
 	</button>
