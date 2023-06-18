@@ -43,7 +43,7 @@
 
 	$: validItems = items.filter((item) => item.payers.length > 0);
 	$: itemSum = validItems.reduce((sum, item) => sum + item.value, 0);
-	$: itemsMatchSubtotal = itemSum.toFixed(2) === subtotal.toFixed(2);
+	$: itemsMatchSubtotal = itemSum ? itemSum.toFixed(2) === subtotal.toFixed(2) : false;
 </script>
 
 <h1>bill splitter 🧾 💵</h1>
